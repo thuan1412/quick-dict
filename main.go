@@ -17,6 +17,7 @@ func getWindow(text string) *gtk.Window {
 	window.Connect("destroy", gtk.MainQuit)
 
 	textview := gtk.NewTextView()
+	textview.SetWrapMode(gtk.WRAP_WORD)
 	textview.SetEditable(false)
 	textview.SetCursorVisible(false)
 	var iter gtk.TextIter
