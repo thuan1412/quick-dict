@@ -2,7 +2,7 @@
 Quickly translate the selected words.
 
 ## Requiements
-This tool uses (translate-shell)[https://github.com/soimort/translate-shell] to translate text. So you must install trans first.
+This tool uses [translate-shell](https://github.com/soimort/translate-shell) to translate text. So you must install trans first.
 ```sh
 sudo apt install translate-shell
 ```
