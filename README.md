@@ -23,3 +23,9 @@ And create a shortcut to run the command.
 
 
 Then, you can use the shortcut to open the popup window to translate the selected text to Vietnamese.
+
+
+
+## Demo
+After install successfully, you can use the shortcut the translate the selected text
+![image](https://user-images.githubusercontent.com/36019052/234150381-a6ba19ac-451b-4406-9c91-c75ca2fbf48f.png)
