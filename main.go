@@ -8,13 +8,15 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-func getWindow(text string) *gtk.Window {
+func getWindow(originText, transText string) *gtk.Window {
 
 	window := gtk.NewWindow(gtk.WINDOW_TOPLEVEL)
 	window.SetPosition(gtk.WIN_POS_CENTER)
-	window.SetTitle("GTK Go!")
+	window.SetTitle("Translate GUI")
 	window.SetIconName("textview")
+
 	window.Connect("destroy", gtk.MainQuit)
+	window.Connect("focus-out-event", gtk.MainQuit)
 
 	textview := gtk.NewTextView()
 	textview.SetWrapMode(gtk.WRAP_WORD)
@@ -24,9 +26,26 @@ func getWindow(text string) *gtk.Window {
 	buffer := textview.GetBuffer()
 
 	buffer.GetStartIter(&iter)
-	buffer.Insert(&iter, text)
+	buffer.Insert(&iter, transText)
 
-	window.Add(textview)
+	openGgtlstBtn := gtk.NewButtonWithLabel("Open Google Translate")
+	openGgtlstBtn.SetSizeRequest(20, 10)
+
+	openGgtlstBtn.Connect("clicked", func() {
+		url := fmt.Sprintf("https://translate.google.com/?sl=en&tl=vi&text=%s&op=translate", originText)
+		cmd := exec.Command("google-chrome", url)
+		err := cmd.Start()
+		if err != nil {
+			fmt.Println("Failed to execute command:", err)
+		}
+	})
+
+	// Add the button to a vertical box
+	vbox := gtk.NewVBox(false, 1)
+	vbox.PackStart(textview, false, false, 0)
+	vbox.PackEnd(openGgtlstBtn, true, true, 0)
+	window.Add(vbox)
+
 	window.SetSizeRequest(400, 300)
 	window.ShowAll()
 
@@ -56,7 +75,7 @@ func showWindow() {
 		transText := trans(selectedText)
 
 		gtk.Init(nil)
-		_ = getWindow(transText)
+		_ = getWindow(selectedText, transText)
 		gtk.Main()
 	}
 
