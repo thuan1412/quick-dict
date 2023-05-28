@@ -43,4 +43,4 @@ Then, you can use the shortcut to open the popup window to translate the selecte
 
 ## Demo
 After install successfully, you can use the shortcut the translate the selected text
-![image](https://user-images.githubusercontent.com/36019052/234150381-a6ba19ac-451b-4406-9c91-c75ca2fbf48f.png)
+![image](https://github.com/thuan1412/quick-dict/assets/36019052/904b5f6d-0404-42c4-acd3-23d5a9aca6e6)
