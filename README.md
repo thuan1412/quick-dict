@@ -17,6 +17,8 @@ go install github.com/thuan1412/quick-dict@latest
 ```
 to install the executable file.
 
+Or build from source code.
+
 And create a shortcut to run the command.
 
 ![image](https://user-images.githubusercontent.com/36019052/233822979-fe205d12-d59e-463d-896c-1c47bcbaaec5.png)
