@@ -1,6 +1,10 @@
 # quick-dict
 Quickly translate the selected words.
 
+## Featueres
+- Translate the selected text using [translate-shell](https://github.com/soimort/translate-shell)
+- Speak the selected text using [google-speech](https://pypi.org/project/google-speech/)
+
 ## Requiements
 This tool uses [translate-shell](https://github.com/soimort/translate-shell) to translate text. So you must install trans first.
 ```sh
