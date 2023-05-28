@@ -19,6 +19,15 @@ to install the executable file.
 
 Or build from source code.
 
+In order to listen to the speak of the text, install [google-speech](https://pypi.org/project/google-speech/)
+and its dependencies
+
+```sh
+pip install google-speech
+sudo apt-get install sox
+sudo apt-get install libsox-fmt-mp3
+```
+
 And create a shortcut to run the command.
 
 ![image](https://user-images.githubusercontent.com/36019052/233822979-fe205d12-d59e-463d-896c-1c47bcbaaec5.png)
