@@ -8,6 +8,25 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+func getTextViewContent(textView *gtk.TextView) string {
+	buffer := textView.GetBuffer()
+
+	var startIter, endIter gtk.TextIter
+	buffer.GetStartIter(&startIter)
+	buffer.GetEndIter(&endIter)
+	text := buffer.GetText(&startIter, &endIter, true)
+	return text
+}
+
+func updateTextViewContent(textView *gtk.TextView, text string) {
+	buffer := textView.GetBuffer()
+	var startIter, endIter gtk.TextIter
+	buffer.GetStartIter(&startIter)
+	buffer.GetEndIter(&endIter)
+	buffer.Delete(&startIter, &endIter)
+	buffer.Insert(&startIter, text)
+}
+
 func openTlsBtn(text string) *gtk.Button {
 	openGgtlstBtn := gtk.NewButtonWithLabel("Open Google Translate")
 	openGgtlstBtn.SetSizeRequest(20, 10)
@@ -38,7 +57,7 @@ func getSpeakBtn(text string) *gtk.Button {
 	return btn
 }
 
-func getWindow(originText, transText string) *gtk.Window {
+func getWindow(orgText, transText string) *gtk.Window {
 
 	window := gtk.NewWindow(gtk.WINDOW_TOPLEVEL)
 	window.SetPosition(gtk.WIN_POS_CENTER)
@@ -48,31 +67,47 @@ func getWindow(originText, transText string) *gtk.Window {
 	window.Connect("destroy", gtk.MainQuit)
 	window.Connect("focus-out-event", gtk.MainQuit)
 
-	textview := gtk.NewTextView()
-	textview.SetWrapMode(gtk.WRAP_WORD)
-	textview.SetEditable(false)
-	textview.SetCursorVisible(false)
-	// textview.SetSizeRequest(20, 10)
+	orgTextView := gtk.NewTextView()
+	orgTextView.SetWrapMode(gtk.WRAP_WORD)
+	orgTextView.SetEditable(true)
+	orgTextView.SetCursorVisible(true)
+	orgTextView.SetBorderWidth(2)
+
+	orgBuffer := orgTextView.GetBuffer()
+	var orgTextIter gtk.TextIter
+	orgBuffer.GetStartIter(&orgTextIter)
+	orgBuffer.Insert(&orgTextIter, orgText)
+
+	translatedTextView := gtk.NewTextView()
+	translatedTextView.SetWrapMode(gtk.WRAP_WORD)
+	translatedTextView.SetCursorVisible(false)
+	orgBuffer.Connect("changed", func() {
+		text := getTextViewContent(orgTextView)
+		transText := trans(text)
+		updateTextViewContent(translatedTextView, transText)
+	})
+
 	var iter gtk.TextIter
-	buffer := textview.GetBuffer()
+	buffer := translatedTextView.GetBuffer()
 
 	buffer.GetStartIter(&iter)
 	buffer.Insert(&iter, transText)
-
-	topHbox := gtk.NewHBox(true, 0)
-	topHbox.PackStart(textview, true, true, 0)
-	topHbox.SetSizeRequest(400, 200)
+	topVbox := gtk.NewVBox(true, 0)
+	topVbox.PackStart(orgTextView, true, true, 0)
+	topVbox.SetSpacing(5)
+	topVbox.PackStart(translatedTextView, true, true, 0)
+	topVbox.SetSizeRequest(400, 200)
 
 	// Add the button to a vertical box
 	vbox := gtk.NewVBox(false, 1)
-	vbox.PackStart(topHbox, true, true, 0)
+	vbox.PackStart(topVbox, true, true, 0)
 
 	// button group
 	bottomHbox := gtk.NewHBox(true, 1)
 	bottomHbox.SetSizeRequest(400, 50)
 
-	openGgtlstBtn := openTlsBtn(originText)
-	speakBtn := getSpeakBtn(originText)
+	openGgtlstBtn := openTlsBtn(orgText)
+	speakBtn := getSpeakBtn(orgText)
 
 	bottomHbox.PackStart(openGgtlstBtn, true, true, 0)
 	bottomHbox.PackStart(speakBtn, true, true, 0)
@@ -99,20 +134,24 @@ func trans(text string) string {
 	}
 }
 
-func showWindow() {
+func getSelectedText() string {
 	cmd := exec.Command("xclip", "-out", "-selection", "primary")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("Failed to execute command:", err)
+		panic(err)
 	} else {
-		selectedText := string(out)
-		transText := trans(selectedText)
-
-		gtk.Init(nil)
-		_ = getWindow(selectedText, transText)
-		gtk.Main()
+		return string(out)
 	}
+}
 
+func showWindow() {
+	selectedText := getSelectedText()
+	transText := trans(selectedText)
+
+	gtk.Init(nil)
+	_ = getWindow(selectedText, transText)
+	gtk.Main()
 }
 
 func main() {
