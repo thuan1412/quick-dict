@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
+	"time"
 
 	"github.com/mattn/go-gtk/gtk"
 	"golang.org/x/text/unicode/norm"
@@ -81,10 +83,29 @@ func getWindow(orgText, transText string) *gtk.Window {
 	translatedTextView := gtk.NewTextView()
 	translatedTextView.SetWrapMode(gtk.WRAP_WORD)
 	translatedTextView.SetCursorVisible(false)
+
+	var (
+		inputTextcancel context.CancelFunc
+		inputTextCtx    context.Context
+	)
 	orgBuffer.Connect("changed", func() {
 		text := getTextViewContent(orgTextView)
-		transText := trans(text)
-		updateTextViewContent(translatedTextView, transText)
+		if inputTextcancel != nil {
+			inputTextcancel()
+		}
+		inputTextCtx, inputTextcancel = context.WithCancel(context.Background())
+		go func() {
+			for {
+				select {
+				case <-inputTextCtx.Done():
+					return
+				case <-time.After(1 * time.Second):
+					transText := trans(text)
+					// reset cancel function when user typed new input
+					updateTextViewContent(translatedTextView, transText)
+				}
+			}
+		}()
 	})
 
 	var iter gtk.TextIter
